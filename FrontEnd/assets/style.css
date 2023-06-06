@@ -58,6 +58,15 @@ header {
 	justify-content: space-between;
 	margin: 50px 0
 }
+
+header a{
+	text-decoration: none;
+	color: #000000;
+}
+
+header a:hover{
+	color:#B1663C;
+}
 section {
 	margin: 50px 0
 }
@@ -210,3 +219,56 @@ footer nav ul {
 	margin: 2em
 }
 
+/* Login page */
+.bodyLogin{
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	justify-content: space-between;
+}
+
+.selectedPage{
+	font-weight: 600;
+}
+form{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: left;
+	margin-top: 162px;
+}
+
+.form{
+	margin-top: 32px;
+}
+
+.login-description{
+	margin-bottom: 7px;
+}
+
+#login-description-password{
+	margin-top: 30px;
+}
+
+form input{
+	width: 379px;
+	height: 41px;
+}
+
+form button{
+	margin-top: 47px;
+	margin-bottom: 28px ;
+	background-color: #1D6154;
+	color:#FFFFFF;
+	width: 179px;
+	height: 36px;
+	border-radius: 60px;
+}
+
+.forgottenPassword{
+	text-decoration: underline;
+}
+
+/* .login-footer{
+	margin-top: 355px;
+} */
