@@ -119,8 +119,10 @@ async function generateFilters(){
     filterSection.addEventListener("click", function(event) {
       const selectedFilter = event.target;
       const index = filtersArray.indexOf(selectedFilter);
+      if (index !== -1){
       update(index, currentIndex);
       console.log ("index actif: ", index);
+      }
     });
     
 }
