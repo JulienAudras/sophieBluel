@@ -19,6 +19,16 @@ document.querySelector(".form").addEventListener("submit", function (event) {
     .then((response) => response.json())
 
     .then((data) => {
-      console.log("résultat du post: ", data);
+      const token = data.token;
+      localStorage.setItem("token", token);
+      console.log("token: ", token);
+
+      if (token) {
+        window.location.href = "index.html";
+      } else {
+        alert("Email ou mot de passe incorrect");
+      }
     });
 });
+
+console.log(localStorage);

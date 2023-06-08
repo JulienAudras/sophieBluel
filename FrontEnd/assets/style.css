@@ -272,3 +272,65 @@ form button{
 /* .login-footer{
 	margin-top: 355px;
 } */
+
+/* Editor mode */
+
+.editorBar{
+	display: flex;
+	width: 100vw;
+	height: 59px;
+	background-color: #000000;
+	position: relative;
+	left: 50%;
+	transform: translateX(-50%);
+	justify-content: center;
+	align-items: center;
+	gap: 21px;
+}
+
+.edittorTitle{
+	display: flex;
+	color: #FFFFFF;
+	justify-content: center;
+	align-content: center;
+	gap: 7px;
+}
+
+
+.publishButton{
+	background-color:#FFFFFF;
+	width: 216px;
+	height: 38px;
+	border-radius: 60px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-weight: 500;
+}
+
+.sectionPhotoIntro{
+	display: block;
+}
+
+.buttonModifier{
+	display: flex;
+	gap: 8px;
+}
+
+#buttonModifier-0{
+	margin-top: 13px;
+	margin-left: 55px;
+}
+
+#buttonModifier-1{
+	margin-top: 10px;
+	
+}
+
+.projetsTitleSection{
+	display: flex;
+	justify-content: center;
+	align-content: center;
+	gap: 31px;
+	
+}

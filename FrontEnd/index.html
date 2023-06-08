@@ -10,12 +10,16 @@
       href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Work+Sans&display=swap"
       rel="stylesheet"
     />
+    <script
+      src="https://kit.fontawesome.com/b4343811be.js"
+      crossorigin="anonymous"
+    ></script>
     <meta name="description" content="" />
     <link rel="stylesheet" href="./assets/style.css" />
   </head>
   <body>
-    <header>
-      <h1>Sophie Bluel <span>Architecte d'inteérieur</span></h1>
+    <header id="pageHeader">
+      <h1 id="pageTitle">Sophie Bluel <span>Architecte d'inteérieur</span></h1>
       <nav>
         <ul>
           <li>projets</li>
@@ -27,8 +31,12 @@
     </header>
     <main>
       <section id="introduction">
-        <figure>
-          <img src="./assets/images/sophie-bluel.png" alt="" />
+        <figure class="sectionPhotoIntro">
+          <img
+            class="photoIntro"
+            src="./assets/images/sophie-bluel.png"
+            alt=""
+          />
         </figure>
         <article>
           <h2>Designer d'espace</h2>
@@ -50,7 +58,9 @@
         </article>
       </section>
       <section id="portfolio">
-        <h2>Mes Projets</h2>
+        <div class="projetsTitleSection">
+          <h2>Mes Projets</h2>
+        </div>
         <div class="filters"></div>
         <div class="gallery"></div>
       </section>
