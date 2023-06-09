@@ -125,8 +125,12 @@ generateFilters();
 
 // // // Editor mode // // //
 
+const closeButton = document.querySelector(".closeBtn");
+
 const token = localStorage.getItem("token");
 // const buttonModifiers = [];
+
+let modal;
 
 function editorMode() {
   if (token) {
@@ -185,21 +189,121 @@ function editorMode() {
 
     const projetsTitleSection = document.querySelector(".projetsTitleSection");
     insertButtonModifier(projetsTitleSection);
+
+    const buttonModifierGalerie = document.getElementById("buttonModifier-1");
+
+    buttonModifierGalerie.addEventListener("click", generateAndOpenModal);
   }
-
-  // Giving separates id to buttons
-  // const buttonModifierClass = "buttonModifier";
-  // const buttonModifierElements = document.querySelectorAll(
-  //   "." + buttonModifierClass
-  // );
-
-  // buttonModifierElements.forEach((element, index) => {
-  //   const uniqueId = buttonModifierClass + "-" + index;
-  //   element.id = uniqueId;
-  // });
 }
 
 editorMode();
+function openModal() {
+  modal.style.display = "block";
+}
+function closeModal() {
+  modal.style.display = "none";
+}
+
+function generateModal() {
+  modal = document.createElement("div");
+  modal.classList.add("modal");
+
+  const modalBackground = document.createElement("div");
+  modalBackground.classList.add("modal-background");
+
+  modalBackground.addEventListener("click", closeModal);
+
+  const modalWindow = document.createElement("div");
+  modalWindow.classList.add("modal-window");
+
+  const closeBtn = document.createElement("span");
+  closeBtn.classList.add("closeBtn");
+  closeBtn.innerHTML = "&times;";
+
+  closeBtn.addEventListener("click", closeModal);
+
+  const modalTitle = document.createElement("h3");
+  modalTitle.innerText = "Galerie photo";
+
+  const modalGallery = document.createElement("div");
+  modalGallery.classList.add("modal-gallery");
+
+  const hr = document.createElement("hr");
+
+  const addPhotoButton = document.createElement("div");
+  addPhotoButton.classList.add("addPhotoButton");
+
+  const addPhotoText = document.createElement("p");
+  addPhotoText.innerText = "Ajouter une photo";
+
+  const deleteAll = document.createElement("p");
+  deleteAll.classList.add("deleteAll");
+  deleteAll.innerText = "Supprimer la galerie";
+
+  function escapeClose(e) {
+    if (e.keyCode === 27) {
+      closeModal();
+    }
+  }
+
+  window.addEventListener("keyup", escapeClose);
+
+  modal.appendChild(modalBackground);
+  modal.appendChild(modalWindow);
+  modalWindow.appendChild(closeBtn);
+  modalWindow.appendChild(modalTitle);
+  modalWindow.appendChild(modalGallery);
+  modalWindow.appendChild(hr);
+  modalWindow.appendChild(addPhotoButton);
+  addPhotoButton.appendChild(addPhotoText);
+  modalWindow.appendChild(deleteAll);
+
+  return modal;
+}
+
+async function getWorksDatasForModal() {
+  await fetch("http://localhost:5678/api/works")
+    .then((response) => response.json())
+    .then((data) => {
+      const modalGallery = document.querySelector(".modal-gallery");
+      modalGallery.innerHTML = "";
+
+      data.forEach((item) => {
+        const workElement = document.createElement("figure");
+        workElement.classList.add("figureForModal");
+
+        const imgWorkElement = document.createElement("img");
+        imgWorkElement.src = item.imageUrl;
+        imgWorkElement.classList.add("imgForModal");
+
+        const trashContainer = document.createElement("div");
+        trashContainer.classList.add("trashContainer");
+
+        const trashElement = document.createElement("i");
+        trashElement.classList.add("fa-regular", "fa-trash-can");
+
+        const captionWorkElement = document.createElement("figcaption");
+        captionWorkElement.innerText = "editer";
+        captionWorkElement.classList.add("figcaptionForModal");
+
+        modalGallery.appendChild(workElement);
+        workElement.appendChild(imgWorkElement);
+        workElement.appendChild(captionWorkElement);
+        workElement.appendChild(trashContainer);
+        trashContainer.appendChild(trashElement);
+      });
+    });
+}
+function generateAndOpenModal() {
+  if (modal) {
+    document.body.removeChild(modal);
+  }
+
+  modal = generateModal();
+  document.body.appendChild(modal);
+  openModal();
+  getWorksDatasForModal();
+}
 
 console.log(localStorage);
 console.log("token: ", token);
