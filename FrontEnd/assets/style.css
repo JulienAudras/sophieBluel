@@ -457,7 +457,6 @@ form button{
 .addPhotoButton p{
 	color: white;
 	font-weight: 700;
-	margin-top:5px;
 	line-height: 36px;
 }
 
@@ -497,12 +496,21 @@ form button{
 	right: 5px;
 }
 
-.trashElement{
-	color: black;
+.trashContainer:hover,
+.trashContainer:hover * {
+	transform: scale(1.2);
+}
+
+.fa-trash-can{
+	color:#FFFFFF;
 	position: absolute;
-	top: 12px;
-	right:9px;
-	font-size: 9px;
+	top: 3px;
+	right:4px;
+	font-size: 11px;
+	background-color: black;
+	color: white;
+	animation-name: binAnim;
+	animation-duration: 2s;
 
 
 }
@@ -515,3 +523,4 @@ form button{
 	from{opacity:0}
 	to {opacity: 0.5}
 }
+

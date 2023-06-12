@@ -7,6 +7,7 @@ async function getWorksDatas() {
 
       data.forEach((item) => {
         const workElement = document.createElement("figure");
+        workElement.id = item.id;
 
         const imgWorkElement = document.createElement("img");
         imgWorkElement.src = item.imageUrl;
@@ -271,6 +272,8 @@ async function getWorksDatasForModal() {
       data.forEach((item) => {
         const workElement = document.createElement("figure");
         workElement.classList.add("figureForModal");
+        const figureId = item.id;
+        workElement.id = `${figureId}`;
 
         const imgWorkElement = document.createElement("img");
         imgWorkElement.src = item.imageUrl;
@@ -280,7 +283,7 @@ async function getWorksDatasForModal() {
         trashContainer.classList.add("trashContainer");
 
         const trashElement = document.createElement("i");
-        trashElement.classList.add("fa-regular", "fa-trash-can");
+        trashElement.classList.add("fa-solid", "fa-trash-can");
 
         const captionWorkElement = document.createElement("figcaption");
         captionWorkElement.innerText = "editer";
@@ -291,9 +294,81 @@ async function getWorksDatasForModal() {
         workElement.appendChild(captionWorkElement);
         workElement.appendChild(trashContainer);
         trashContainer.appendChild(trashElement);
+
+        // fonction a supprimer à la fin
+
+        const trashContainers = document.querySelectorAll(".trashContainer");
+        trashContainers.forEach((trashContainer) => {
+          trashContainer.addEventListener("click", function () {
+            deleteElementById(item.id), getWorksDatas(), generateAndOpenModal();
+          });
+        });
       });
     });
 }
+
+async function deleteElementById(id) {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`http://localhost:5678/api/works/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (response.ok) {
+    const parentElement = document.getElementById(id);
+    if (parentElement) {
+      parentElement.remove();
+    }
+
+    const modalElement = document.getElementById(`figure-${id}`);
+    if (modalElement) {
+      modalElement.remove();
+    }
+  }
+}
+
+// async function deleteElementFromModal(event) {
+//   const token = localStorage.getItem("token");
+
+//   const trashContainer = event.target.closest(".trashContainer");
+//   if (trashContainer) {
+//     const parentElement = trashContainer.parentNode;
+//     if (parentElement && parentElement.id) {
+//       const elementId = parentElement.id;
+//       await deleteElementById(elementId);
+//     }
+//   }
+// }
+
+// async function updateMainPage() {
+//   const response = await fetch("http://localhost:5678/api/works");
+//   if (response.ok) {
+//     const data = await response.json();
+//     const mainGallery = document.querySelector(".main-gallery");
+//     mainGallery.innerHTML = "";
+
+//     data.forEach((item) => {
+//       const workElement = document.createElement("figure");
+//       workElement.id = item.id;
+
+//       const imgWorkElement = document.createElement("img");
+//       imgWorkElement.src = item.imageUrl;
+
+//       const captionWorkElement = document.createElement("figcaption");
+//       captionWorkElement.innerText = item.title;
+
+//       gallery.appendChild(workElement);
+//       workElement.appendChild(imgWorkElement);
+//       workElement.appendChild(captionWorkElement);
+
+//       mainGallery.appendChild(workElement);
+//     });
+
+//     console.log("Page principale mise à jour avec succès.");
+//   }
+// }
+
 function generateAndOpenModal() {
   if (modal) {
     document.body.removeChild(modal);
