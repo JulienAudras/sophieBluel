@@ -122,8 +122,6 @@ async function generateFilters() {
   });
 }
 
-generateFilters();
-
 // // // Editor mode // // //
 
 const closeButton = document.querySelector(".closeBtn");
@@ -134,70 +132,75 @@ const token = localStorage.getItem("token");
 let modal;
 
 function editorMode() {
-  if (token) {
-    const header = document.getElementById("pageHeader");
-    const body = document.body;
+  const header = document.getElementById("pageHeader");
+  const body = document.body;
 
-    const editorBar = document.createElement("div");
-    editorBar.classList.add("editorBar");
-    body.appendChild(editorBar);
-    body.insertBefore(editorBar, header);
+  const editorBar = document.createElement("div");
+  editorBar.classList.add("editorBar");
+  body.appendChild(editorBar);
+  body.insertBefore(editorBar, header);
 
-    const edittorTitle = document.createElement("div");
-    edittorTitle.classList.add("edittorTitle");
-    editorBar.appendChild(edittorTitle);
-    const editorIcon = document.createElement("i");
-    editorIcon.classList.add("fa-regular", "fa-pen-to-square");
-    edittorTitle.appendChild(editorIcon);
-    const editorTitleText = document.createElement("h4");
-    editorTitleText.innerText = "Mode édition";
-    editorTitleText.classList.add("editorTitleText");
-    edittorTitle.appendChild(editorTitleText);
+  const edittorTitle = document.createElement("div");
+  edittorTitle.classList.add("edittorTitle");
+  editorBar.appendChild(edittorTitle);
+  const editorIcon = document.createElement("i");
+  editorIcon.classList.add("fa-regular", "fa-pen-to-square");
+  edittorTitle.appendChild(editorIcon);
+  const editorTitleText = document.createElement("h4");
+  editorTitleText.innerText = "Mode édition";
+  editorTitleText.classList.add("editorTitleText");
+  edittorTitle.appendChild(editorTitleText);
 
-    const publishButton = document.createElement("div");
-    publishButton.classList.add("publishButton");
-    editorBar.appendChild(publishButton);
-    const publishText = document.createElement("p");
-    publishText.innerText = "publier les changement";
-    publishText.classList.add("publishText");
-    publishButton.appendChild(publishText);
+  const publishButton = document.createElement("div");
+  publishButton.classList.add("publishButton");
+  editorBar.appendChild(publishButton);
+  const publishText = document.createElement("p");
+  publishText.innerText = "publier les changement";
+  publishText.classList.add("publishText");
+  publishButton.appendChild(publishText);
 
-    // Button to edit
-    let buttonModifierCounter = 0;
+  // Button to edit
 
-    function insertButtonModifier(targetSection) {
-      const buttonModifier = document.createElement("div");
-      buttonModifier.classList.add("buttonModifier");
+  const introSection = document.querySelector(".sectionPhotoIntro");
+  insertButtonModifier(introSection);
 
-      const editorIcon = document.createElement("i");
-      editorIcon.classList.add("fa-regular", "fa-pen-to-square");
-      buttonModifier.appendChild(editorIcon);
+  const projetsTitleSection = document.querySelector(".projetsTitleSection");
+  insertButtonModifier(projetsTitleSection);
 
-      const buttonModifierText = document.createElement("p");
-      buttonModifierText.innerText = "modifier";
-      buttonModifier.appendChild(buttonModifierText);
+  const buttonModifierGalerie = document.getElementById("buttonModifier-1");
 
-      const uniqueId = "buttonModifier-" + buttonModifierCounter;
-      buttonModifier.id = uniqueId;
-      buttonModifierCounter++;
-
-      targetSection.appendChild(buttonModifier);
-      // buttonModifiers.push(buttonModifier);
-    }
-
-    const introSection = document.querySelector(".sectionPhotoIntro");
-    insertButtonModifier(introSection);
-
-    const projetsTitleSection = document.querySelector(".projetsTitleSection");
-    insertButtonModifier(projetsTitleSection);
-
-    const buttonModifierGalerie = document.getElementById("buttonModifier-1");
-
-    buttonModifierGalerie.addEventListener("click", generateAndOpenModal);
-  }
+  buttonModifierGalerie.addEventListener("click", generateAndOpenModal);
 }
 
-editorMode();
+let buttonModifierCounter = 0;
+
+function insertButtonModifier(targetSection) {
+  const buttonModifier = document.createElement("div");
+  buttonModifier.classList.add("buttonModifier");
+
+  const editorIcon = document.createElement("i");
+  editorIcon.classList.add("fa-regular", "fa-pen-to-square");
+  buttonModifier.appendChild(editorIcon);
+
+  const buttonModifierText = document.createElement("p");
+  buttonModifierText.innerText = "modifier";
+  buttonModifier.appendChild(buttonModifierText);
+
+  const uniqueId = "buttonModifier-" + buttonModifierCounter;
+  buttonModifier.id = uniqueId;
+  buttonModifierCounter++;
+
+  targetSection.appendChild(buttonModifier);
+  // buttonModifiers.push(buttonModifier);
+}
+
+if (token) {
+  editorMode();
+  insertButtonModifier();
+} else {
+  generateFilters();
+}
+
 function openModal() {
   modal.style.display = "block";
 }
@@ -295,12 +298,12 @@ async function getWorksDatasForModal() {
         workElement.appendChild(trashContainer);
         trashContainer.appendChild(trashElement);
 
-        // fonction a supprimer à la fin
-
         const trashContainers = document.querySelectorAll(".trashContainer");
         trashContainers.forEach((trashContainer) => {
           trashContainer.addEventListener("click", function () {
-            deleteElementById(item.id), getWorksDatas(), generateAndOpenModal();
+            deleteElementById(item.id);
+            getWorksDatas();
+            generateAndOpenModal();
           });
         });
       });
