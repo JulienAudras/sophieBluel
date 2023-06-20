@@ -632,6 +632,19 @@ justify-content: space-between;
 	bottom: 19px;
 }
 
+.photoPreviewImg{
+	max-height: 169px;
+	max-width: 420px;
+	object-fit: cover;
+	z-index: 4;
+}
+
+.invalidFile{
+	z-index: 5;
+	color: red;
+	font-style: italic;
+}
+
 .titleLabel{
 	display: block;
 	text-align: left;
@@ -679,9 +692,24 @@ justify-content: space-between;
 	align-items: center;
 }
 
+.sendButton:hover{
+	filter: brightness(1);
+	box-shadow: none;
+}
+
 .sendButtonText{
 	color: #FFFFFF;
 	font-family: syne;
+}
+
+#buttonReadyToWork{
+	background-color:#1D6154;
+}
+
+#buttonReadyToWork:hover{
+	filter: brightness(0.9);
+	box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.2);
+	cursor: default;
 }
 
 @keyframes modalOpen{

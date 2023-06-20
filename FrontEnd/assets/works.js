@@ -22,30 +22,6 @@ async function getWorksDatas() {
     });
 }
 
-// async function generateCategoriesMenu() {
-//   const addPhotoForm = document.querySelector(".addPhotoForm");
-
-//   const response = await fetch("http://localhost:5678/api/categories");
-//   const data = await response.json();
-//   // .then((response) => response.json())
-//   // .then((data) => {
-//   const menu = document.createElement("select");
-
-//   data.forEach((category) => {
-//     const option = document.createElement("option");
-//     option.value = category;
-//     option.textContent = category;
-//     menu.appendChild(option);
-//   });
-//   addPhotoForm.appendChild(menu);
-// }
-
-// async function getCategoriesFromApi() {
-//   const response = await fetch("http://localhost:5678/api/categories");
-//   const data = await response.json();
-//   return data;
-// }
-
 getWorksDatas();
 
 // // // Creating Filters // // //
@@ -350,7 +326,8 @@ async function getWorksDatasForModal() {
 
         const trashContainers = document.querySelectorAll(".trashContainer");
         trashContainers.forEach((trashContainer) => {
-          trashContainer.addEventListener("click", function () {
+          trashContainer.addEventListener("click", function (event) {
+            event.preventDefault();
             deleteElementById(item.id);
             getWorksDatas();
             generateAndOpenModal();
@@ -386,6 +363,7 @@ let addPhotoModal;
 function generateAddPhotoModal() {
   addPhotoModal = document.createElement("div");
   addPhotoModal.classList.add("modal", "photoModal");
+  document.body.appendChild(addPhotoModal);
 
   const modalBackground = document.createElement("div");
   modalBackground.classList.add("modal-background");
@@ -442,19 +420,53 @@ function generateAddPhotoModal() {
   uploadPhotoButton.accept = ".jpg, .png";
   uploadPhotoButtonContainer.appendChild(uploadPhotoButton);
 
+  let img;
+
+  uploadPhotoButton.addEventListener("input", () => {
+    const photoPreview = new FileReader();
+    photoPreview.readAsDataURL(uploadPhotoButton.files[0]);
+
+    photoPreview.addEventListener("load", () => {
+      const invalidFile = document.querySelector(".invalidFile");
+      var fileInput = document.getElementById("photo");
+      var file = fileInput.files[0];
+      // var invalidFile = document.querySelector(".invalidFile");
+
+      if (file.type !== "image/jpeg" && file.type !== "image/png") {
+        invalidFile.innerText = "Veuillez sélectionner un fichier JPG ou PNG.";
+        console.log("pas le bon format");
+      } else if (file.size > 4 * 1024 * 1024) {
+        invalidFile.innerText =
+          "Veuillez sélectionner un fichier de moins de 4 Mo.";
+        console.log("trop lourd");
+      } else {
+        invalidFile.innerText = "";
+        const url = photoPreview.result;
+
+        img = new Image();
+        img.classList.add("photoPreviewImg");
+        img.src = url;
+        uploadPhotoContainer.appendChild(img);
+        return img;
+      }
+    });
+  });
+
   const uploadPhotoButtonText = document.createElement("label");
   uploadPhotoButtonText.classList.add("uploadPhotoButtonText");
   uploadPhotoButtonText.setAttribute("for", "file-input");
   uploadPhotoButtonText.textContent = "+ Ajouter photo";
   uploadPhotoButtonContainer.appendChild(uploadPhotoButtonText);
 
-  uploadPhotoButtonText.addEventListener("click", () => {
-    uploadPhotoButton.click();
-  });
   const uploadPhotodescription = document.createElement("p");
   uploadPhotodescription.classList.add("uploadPhotodescription");
   uploadPhotodescription.innerText = "jpg, png : 4mo max";
   uploadPhotoContainer.appendChild(uploadPhotodescription);
+
+  const invalidFile = document.createElement("p");
+  invalidFile.innerText = "";
+  invalidFile.classList.add("invalidFile");
+  addPhotoForm.appendChild(invalidFile);
 
   const titleLabel = document.createElement("label");
   titleLabel.classList.add("titleLabel");
@@ -475,7 +487,8 @@ function generateAddPhotoModal() {
   const categorySelect = document.createElement("select");
   categorySelect.name = "Categorie";
   categorySelect.classList.add("categorySelect");
-
+  let categoryName;
+  let categoryId;
   categorySelect.addEventListener("click", async () => {
     if (categorySelect.options.length === 0) {
       const response = await fetch("http://localhost:5678/api/categories");
@@ -487,6 +500,12 @@ function generateAddPhotoModal() {
         option.text = category.name;
         categorySelect.appendChild(option);
       });
+    } else {
+      const selectedOption =
+        categorySelect.options[categorySelect.selectedIndex];
+      categoryName = selectedOption.text;
+      categoryId = selectedOption.value;
+      console.log("Catégorie sélectionnée :", categoryName);
     }
   });
 
@@ -498,7 +517,79 @@ function generateAddPhotoModal() {
   const hr = document.createElement("hr");
   addPhotoForm.appendChild(hr);
 
-  const sendButton = document.createElement("div");
+  function updateSendButtonId() {
+    const uploadPhotoFiles = uploadPhotoButton.files;
+    const isNameInputFilled = nameInput.value.trim() !== "";
+    const isCategorySelected = categorySelect.value !== "";
+
+    if (
+      uploadPhotoFiles.length > 0 &&
+      isNameInputFilled &&
+      isCategorySelected
+    ) {
+      sendButton.id = "buttonReadyToWork";
+      console.log(sendButton.id);
+    } else {
+      sendButton.id = "";
+      console.log("not ready to work");
+    }
+  }
+
+  uploadPhotoButton.addEventListener("change", updateSendButtonId);
+  nameInput.addEventListener("input", updateSendButtonId);
+  categorySelect.addEventListener("change", updateSendButtonId);
+
+  const sendButton = document.createElement("button");
+  sendButton.type = "submit";
+
+  addPhotoForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const token = localStorage.getItem("token");
+    if (sendButton.id === "buttonReadyToWork") {
+      console.log(uploadPhotoButton.files, nameInput.value, categoryName);
+      event.preventDefault();
+      postDatas();
+      return false;
+    } else {
+      event.preventDefault();
+      console.log("Alright");
+    }
+  });
+
+  async function postDatas() {
+    console.log(categoryName);
+    const token = localStorage.getItem("token");
+    const formData = new FormData();
+    formData.append("image", uploadPhotoButton.files[0]);
+    formData.append("title", nameInput.value);
+    formData.append("category", categoryId);
+
+    const response = await fetch("http://localhost:5678/api/works", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (response.status === 201) {
+      console.log("Données envoyées avec succès");
+      const data = await response.json();
+      console.log("Données retournées :", data);
+      console.log("Attribut 1 :", data.attribut1);
+      console.log("Attribut 2 :", data.attribut2);
+      return data;
+    } else if (response.status === 400) {
+      console.log("Échec de l'envoi des données code 400 Bad Request");
+    } else if (response.status === 401) {
+      console.log("Échec de l'envoi des données code 401 Unauthorized");
+    } else if (response.status === 500) {
+      console.log("Échec de l'envoi des données code 500 Unexpected Error");
+    } else {
+      console.log("nolosé");
+    }
+  }
+
   sendButton.classList.add("sendButton");
   addPhotoForm.appendChild(sendButton);
 
@@ -509,7 +600,6 @@ function generateAddPhotoModal() {
 
   window.addEventListener("keyup", escapeClose);
 
-  document.body.appendChild(addPhotoModal);
   addPhotoModal.appendChild(modalBackground);
   addPhotoModal.appendChild(modalWindow);
   modalWindow.appendChild(iconBar);
