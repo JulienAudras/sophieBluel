@@ -1,3 +1,5 @@
+// Formulaire de connexion
+
 document.querySelector(".form").addEventListener("submit", function (event) {
   event.preventDefault();
 
@@ -9,6 +11,8 @@ document.querySelector(".form").addEventListener("submit", function (event) {
     password: password,
   };
 
+  // Appel à l'api pour uploader données du formulaire
+
   fetch("http://localhost:5678/api/users/login", {
     method: "POST",
     headers: {
@@ -17,10 +21,11 @@ document.querySelector(".form").addEventListener("submit", function (event) {
     body: JSON.stringify(user),
   })
     .then((response) => {
-      console.log(response);
       return response.json();
     })
 
+    // Traitement réponse Api et creation et stockage du token dans local storage
+    // Ou générations de messages d'erreurs
     .then((data) => {
       const token = data.token;
       const invalidEmailDiv = document.querySelector(".invalidEmail");
@@ -30,8 +35,6 @@ document.querySelector(".form").addEventListener("submit", function (event) {
       const existingPasswordErrorMessage =
         invalidPasswordDiv.querySelector(".error-message");
       localStorage.setItem("token", token);
-      console.log("token: ", token);
-      console.log("response status:", data);
 
       if (data.message) {
         if (existingEmailErrorMessage) {
@@ -61,11 +64,4 @@ document.querySelector(".form").addEventListener("submit", function (event) {
         }
       }
     });
-  // if (token) {
-  //   window.location.href = "index.html";
-  // } else {
-  //   alert("Email ou mot de passe incorrect");
-  // }
 });
-
-console.log(localStorage);
