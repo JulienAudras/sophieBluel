@@ -1,5 +1,5 @@
-// Extractions des données de l'API, génération des élements sur la page principale
-// Et attribution dynamique d'id à chaque élement
+// // // Extractions des donnees de l'API, generation des élements sur la page principale // // //
+// // // Et attribution dynamique d'id à chaque élement // // //
 
 async function getWorksDatas() {
   await fetch("http://localhost:5678/api/works")
@@ -29,7 +29,7 @@ async function getWorksDatas() {
 
 getWorksDatas();
 
-// // // Création des filtres par appel à l'API // // //
+// // // Creation des filtres par appel à l'API // // //
 
 const filtersArray = [];
 
@@ -44,7 +44,7 @@ async function generateFilters() {
   const gallery = document.querySelector(".gallery");
 
   let currentIndex = 0;
-  // let lastCategory = "";
+
   await fetch("http://localhost:5678/api/works")
     .then((response) => response.json())
     .then((data) => {
@@ -96,7 +96,7 @@ async function generateFilters() {
       });
     });
 
-  // Mise en "surbrillance" du filtre séléctionné
+  // Mise en "surbrillance" du filtre selectionne
   function update(index) {
     for (let i = 0; i < filtersArray.length; i++) {
       if (i === index) {
@@ -112,24 +112,19 @@ async function generateFilters() {
     const index = filtersArray.indexOf(selectedFilter);
     if (index !== -1) {
       update(index, currentIndex);
-      console.log("index actif: ", index);
     }
   });
 }
 
-// // // Editor mode // // //
+// // // Mode editeur // // //
 
 const closeButton = document.querySelector(".closeBtn");
-
 const token = localStorage.getItem("token");
-// const buttonModifiers = [];
-
 let modal;
 
 function editorMode() {
   const header = document.getElementById("pageHeader");
   const body = document.body;
-
   const editorBar = document.createElement("div");
   editorBar.classList.add("editorBar");
   body.appendChild(editorBar);
@@ -154,8 +149,7 @@ function editorMode() {
   publishText.classList.add("publishText");
   publishButton.appendChild(publishText);
 
-  // Button to edit
-
+  // Création des bouttons modifier aet attribution dynamique d'id à chaque élement
   const introSection = document.querySelector(".sectionPhotoIntro");
   insertButtonModifier(introSection);
 
@@ -186,8 +180,9 @@ function insertButtonModifier(targetSection) {
   buttonModifierCounter++;
 
   targetSection.appendChild(buttonModifier);
-  // buttonModifiers.push(buttonModifier);
 }
+
+// // // Fonctions d'ouverture et fermeture de modale // // //
 
 if (token) {
   editorMode();
@@ -215,61 +210,63 @@ function closeAddPhotoModal() {
   addPhotoModal.style.display = "none";
 }
 
+// // // Creation de la premiere modale (suppression et modifications des elements) // // //
 function generateModal() {
+  // Créations des differents elements dans le dom
   modal = document.createElement("div");
   modal.classList.add("modal");
 
   const modalBackground = document.createElement("div");
   modalBackground.classList.add("modal-background");
-
   modalBackground.addEventListener("click", closeModal);
+  modal.appendChild(modalBackground);
 
   const modalWindow = document.createElement("div");
   modalWindow.classList.add("modal-window");
+  modal.appendChild(modalWindow);
 
   const closeBtn = document.createElement("span");
   closeBtn.classList.add("closeBtn");
   closeBtn.innerHTML = "&times;";
-
   closeBtn.addEventListener("click", closeModal);
+  modalWindow.appendChild(closeBtn);
 
   const modalTitle = document.createElement("h3");
   modalTitle.innerText = "Galerie photo";
+  modalWindow.appendChild(modalTitle);
 
   const modalGallery = document.createElement("div");
   modalGallery.classList.add("modal-gallery");
+  modalWindow.appendChild(modalGallery);
 
   const hr = document.createElement("hr");
+  modalWindow.appendChild(hr);
 
   const addPhotoButton = document.createElement("div");
   addPhotoButton.classList.add("addPhotoButton");
-
   addPhotoButton.addEventListener("click", function () {
     closeModal();
     generateAndOpenAddPhotoModal();
   });
+  modalWindow.appendChild(addPhotoButton);
 
   const addPhotoText = document.createElement("p");
   addPhotoText.innerText = "Ajouter une photo";
+  addPhotoButton.appendChild(addPhotoText);
 
   const deleteAll = document.createElement("p");
   deleteAll.classList.add("deleteAll");
   deleteAll.innerText = "Supprimer la galerie";
-
-  window.addEventListener("keyup", escapeClose);
-
-  modal.appendChild(modalBackground);
-  modal.appendChild(modalWindow);
-  modalWindow.appendChild(closeBtn);
-  modalWindow.appendChild(modalTitle);
-  modalWindow.appendChild(modalGallery);
-  modalWindow.appendChild(hr);
-  modalWindow.appendChild(addPhotoButton);
-  addPhotoButton.appendChild(addPhotoText);
   modalWindow.appendChild(deleteAll);
+
+  // Fermeture de la modale si l'utilisateur appuie sur "echap"
+  window.addEventListener("keyup", escapeClose);
 
   return modal;
 }
+
+// // // Création dynamique des elements de la premiere modale // // //
+// // // Et attribution dynamique d'id à chaque élement // // //
 
 async function getWorksDatasForModal() {
   await fetch("http://localhost:5678/api/works")
@@ -284,88 +281,51 @@ async function getWorksDatasForModal() {
         const dynamicId = item.id;
         const concatenedId = "figureForModal" + dynamicId;
         workElement.id = concatenedId;
-        // workElement.id = `${figureId}`;
+        modalGallery.appendChild(workElement);
 
         const imgWorkElement = document.createElement("img");
         imgWorkElement.src = item.imageUrl;
         imgWorkElement.classList.add("imgForModal");
+        workElement.appendChild(imgWorkElement);
 
         const trashContainer = document.createElement("div");
         trashContainer.classList.add("figureContainer", "trashContainer");
+        workElement.appendChild(trashContainer);
 
         const trashElement = document.createElement("i");
         trashElement.classList.add("fa-solid", "fa-trash-can");
+        trashContainer.appendChild(trashElement);
+
+        // Appel a la fonction de suppression au click sur icone corbeille
+        trashContainer.addEventListener("click", function (event) {
+          deleteElementById(item.id);
+        });
 
         const captionWorkElement = document.createElement("figcaption");
         captionWorkElement.innerText = "editer";
         captionWorkElement.classList.add("figcaptionForModal");
-
-        modalGallery.appendChild(workElement);
-        workElement.appendChild(imgWorkElement);
         workElement.appendChild(captionWorkElement);
 
+        // Creation de l'icone de fleches sur le premier element
         if (index === 0) {
           const arrowsContainer = document.createElement("div");
           arrowsContainer.classList.add("figureContainer", "arrowsContainer");
-
+          workElement.appendChild(arrowsContainer);
           const arrowsElement = document.createElement("i");
           arrowsElement.classList.add(
             "fa-solid",
             "fa-arrows-up-down-left-right"
           );
-
-          workElement.appendChild(arrowsContainer);
           arrowsContainer.appendChild(arrowsElement);
         }
-
-        workElement.appendChild(trashContainer);
-        trashContainer.appendChild(trashElement);
-        trashContainer.addEventListener("click", function (event) {
-          deleteElementById(item.id);
-        });
       });
     });
 }
 
-// async function deleteElementById(id) {
-//   const token = localStorage.getItem("token");
-//   console.log("token pour delete: ", token);
-//   const response = await fetch(`http://localhost:5678/api/works/${id}`, {
-//     method: "DELETE",
-//     headers: {
-//       Authorization: `Bearer ${token}`,
-//     },
-//   });
-//   if (response.ok) {
-//     const elementToRemove = document.getElementById(id);
-//     const modalGalleryForDelete = document.querySelector(".modal-gallery");
-//     const modalElement = document.querySelector("#id.figureForMoal");
-//     const modalElementToRemove = document.querySelector(
-//       `.figureForModal[data-id="id"]`
-//     );
-//     if (elementToRemove) {
-//       console.log(modalElementToRemove);
-//       elementToRemove.parentNode.removeChild(elementToRemove);
-//       // console.log("vatiztat", elementToRemove.parentNode);
-//       // console.log(elementToRemove);
-//     }
-//     // const modalElement = document.getElementById(`figure-${id}`);
-//     if (modalElement) {
-//       // modalElement.remove();
-//       console.log(modalElementToRemove);
-//     }
+// // // Fonction de suprression des elements de la base de données // // //
 
-//     // const modalElement = document.getElementById(`${figureId}`);
-//     // console.log("je suis un element de modale: ", modalElement);
-//     // if (modalElement) {
-//     //   // modalElement.remove();
-//     //   // console.log("je suis un element de modale: ", modalElement);
-//     // }
-//   }
-// }
 async function deleteElementById(id) {
   const token = localStorage.getItem("token");
-  console.log("token pour delete: ", token);
   const response = await fetch(`http://localhost:5678/api/works/${id}`, {
     method: "DELETE",
     headers: {
@@ -385,6 +345,7 @@ async function deleteElementById(id) {
   }
 }
 
+// // // Creation de la seconde modale (ajout de photos) // // //
 let addPhotoModal;
 
 function generateAddPhotoModal() {
