@@ -7,7 +7,10 @@ async function getWorksDatas() {
 
       data.forEach((item) => {
         const workElement = document.createElement("figure");
-        workElement.id = item.id;
+        workElement.classList.add("workElement");
+        const dynamicId = item.id;
+        const concatenedId = "figureForMainPage" + dynamicId;
+        workElement.id = concatenedId;
 
         const imgWorkElement = document.createElement("img");
         imgWorkElement.src = item.imageUrl;
@@ -286,8 +289,10 @@ async function getWorksDatasForModal() {
       data.forEach((item, index) => {
         const workElement = document.createElement("figure");
         workElement.classList.add("figureForModal");
-        const figureId = item.id;
-        workElement.id = `${figureId}`;
+        const dynamicId = item.id;
+        const concatenedId = "figureForModal" + dynamicId;
+        workElement.id = concatenedId;
+        // workElement.id = `${figureId}`;
 
         const imgWorkElement = document.createElement("img");
         imgWorkElement.src = item.imageUrl;
@@ -323,22 +328,52 @@ async function getWorksDatasForModal() {
 
         workElement.appendChild(trashContainer);
         trashContainer.appendChild(trashElement);
-
-        const trashContainers = document.querySelectorAll(".trashContainer");
-        trashContainers.forEach((trashContainer) => {
-          trashContainer.addEventListener("click", function (event) {
-            event.preventDefault();
-            deleteElementById(item.id);
-            getWorksDatas();
-            generateAndOpenModal();
-          });
+        trashContainer.addEventListener("click", function (event) {
+          deleteElementById(item.id);
         });
       });
     });
 }
 
+// async function deleteElementById(id) {
+//   const token = localStorage.getItem("token");
+//   console.log("token pour delete: ", token);
+//   const response = await fetch(`http://localhost:5678/api/works/${id}`, {
+//     method: "DELETE",
+//     headers: {
+//       Authorization: `Bearer ${token}`,
+//     },
+//   });
+//   if (response.ok) {
+//     const elementToRemove = document.getElementById(id);
+//     const modalGalleryForDelete = document.querySelector(".modal-gallery");
+//     const modalElement = document.querySelector("#id.figureForMoal");
+//     const modalElementToRemove = document.querySelector(
+//       `.figureForModal[data-id="id"]`
+//     );
+//     if (elementToRemove) {
+//       console.log(modalElementToRemove);
+//       elementToRemove.parentNode.removeChild(elementToRemove);
+//       // console.log("vatiztat", elementToRemove.parentNode);
+//       // console.log(elementToRemove);
+//     }
+//     // const modalElement = document.getElementById(`figure-${id}`);
+//     if (modalElement) {
+//       // modalElement.remove();
+//       console.log(modalElementToRemove);
+//     }
+
+//     // const modalElement = document.getElementById(`${figureId}`);
+//     // console.log("je suis un element de modale: ", modalElement);
+//     // if (modalElement) {
+//     //   // modalElement.remove();
+//     //   // console.log("je suis un element de modale: ", modalElement);
+//     // }
+//   }
+// }
 async function deleteElementById(id) {
   const token = localStorage.getItem("token");
+  console.log("token pour delete: ", token);
   const response = await fetch(`http://localhost:5678/api/works/${id}`, {
     method: "DELETE",
     headers: {
@@ -346,14 +381,14 @@ async function deleteElementById(id) {
     },
   });
   if (response.ok) {
-    const parentElement = document.getElementById(id);
-    if (parentElement) {
-      parentElement.remove();
-    }
-
-    const modalElement = document.getElementById(`figure-${id}`);
-    if (modalElement) {
-      modalElement.remove();
+    const elementToRemove = document.getElementById("figureForMainPage" + id);
+    console.log(elementToRemove);
+    const elementToRemoveFromModal = document.getElementById(
+      "figureForModal" + id
+    );
+    if (elementToRemove && elementToRemoveFromModal) {
+      elementToRemove.parentNode.removeChild(elementToRemove);
+      elementToRemoveFromModal.parentNode.removeChild(elementToRemoveFromModal);
     }
   }
 }
@@ -420,6 +455,12 @@ function generateAddPhotoModal() {
   uploadPhotoButton.accept = ".jpg, .png";
   uploadPhotoButtonContainer.appendChild(uploadPhotoButton);
 
+  const uploadPhotoButtonText = document.createElement("label");
+  uploadPhotoButtonText.classList.add("uploadPhotoButtonText");
+  uploadPhotoButtonText.setAttribute("for", "photo");
+  uploadPhotoButtonText.textContent = "+ Ajouter photo";
+  uploadPhotoButtonContainer.appendChild(uploadPhotoButtonText);
+
   let img;
 
   uploadPhotoButton.addEventListener("input", () => {
@@ -452,11 +493,11 @@ function generateAddPhotoModal() {
     });
   });
 
-  const uploadPhotoButtonText = document.createElement("label");
-  uploadPhotoButtonText.classList.add("uploadPhotoButtonText");
-  uploadPhotoButtonText.setAttribute("for", "file-input");
-  uploadPhotoButtonText.textContent = "+ Ajouter photo";
-  uploadPhotoButtonContainer.appendChild(uploadPhotoButtonText);
+  // const uploadPhotoButtonText = document.createElement("label");
+  // uploadPhotoButtonText.classList.add("uploadPhotoButtonText");
+  // uploadPhotoButtonText.setAttribute("for", "file-input");
+  // uploadPhotoButtonText.textContent = "+ Ajouter photo";
+  // uploadPhotoButtonContainer.appendChild(uploadPhotoButtonText);
 
   const uploadPhotodescription = document.createElement("p");
   uploadPhotodescription.classList.add("uploadPhotodescription");
@@ -489,8 +530,14 @@ function generateAddPhotoModal() {
   categorySelect.classList.add("categorySelect");
   let categoryName;
   let categoryId;
+  // const initialValue = categorySelect.selectedIndex;
+  const initialOption = document.createElement("option");
+  initialOption.value = "";
+  initialOption.text = "Sélectionnez une catégorie";
+  categorySelect.appendChild(initialOption);
+
   categorySelect.addEventListener("click", async () => {
-    if (categorySelect.options.length === 0) {
+    if (categorySelect.options.length === 1) {
       const response = await fetch("http://localhost:5678/api/categories");
       const data = await response.json();
 
@@ -540,54 +587,77 @@ function generateAddPhotoModal() {
   categorySelect.addEventListener("change", updateSendButtonId);
 
   const sendButton = document.createElement("button");
+  const gallery = document.querySelector(".gallery");
   sendButton.type = "submit";
 
-  addPhotoForm.addEventListener("submit", (event) => {
+  addPhotoForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const token = localStorage.getItem("token");
     if (sendButton.id === "buttonReadyToWork") {
       console.log(uploadPhotoButton.files, nameInput.value, categoryName);
       event.preventDefault();
-      postDatas();
-      return false;
-    } else {
-      event.preventDefault();
-      console.log("Alright");
+      try {
+        await postDatas();
+        img.remove();
+        nameInput.value = "";
+        categorySelect.selectedIndex = 0;
+        gallery.innerHTML = "";
+        await getWorksDatas();
+      } catch (error) {
+        console.log("Erreur d'upload: ", error);
+      }
     }
   });
 
   async function postDatas() {
-    console.log(categoryName);
-    const token = localStorage.getItem("token");
-    const formData = new FormData();
-    formData.append("image", uploadPhotoButton.files[0]);
-    formData.append("title", nameInput.value);
-    formData.append("category", categoryId);
+    return new Promise((resolve) => {
+      const token = localStorage.getItem("token");
+      const formData = new FormData();
+      formData.append("image", uploadPhotoButton.files[0]);
+      formData.append("title", nameInput.value);
+      formData.append("category", categoryId);
 
-    const response = await fetch("http://localhost:5678/api/works", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
+      fetch("http://localhost:5678/api/works", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      }).then((response) => {
+        if (response.status === 201) {
+          resolve();
+        }
+      });
     });
+    //   const data = await response.json();
+    //   const figureForMainPageHTML = `<figure id="figureForMainPage${data.id}">
+    //   <img src="${data.image}">
+    //   <figcaption>${data.title}</figcaption>
+    //   </figure>`;
 
-    if (response.status === 201) {
-      console.log("Données envoyées avec succès");
-      const data = await response.json();
-      console.log("Données retournées :", data);
-      console.log("Attribut 1 :", data.attribut1);
-      console.log("Attribut 2 :", data.attribut2);
-      return data;
-    } else if (response.status === 400) {
-      console.log("Échec de l'envoi des données code 400 Bad Request");
-    } else if (response.status === 401) {
-      console.log("Échec de l'envoi des données code 401 Unauthorized");
-    } else if (response.status === 500) {
-      console.log("Échec de l'envoi des données code 500 Unexpected Error");
-    } else {
-      console.log("nolosé");
-    }
+    //   const gallery = document.querySelector(".gallery");
+    //   gallery.insertAdjacentHTML("beforeend", figureForMainPageHTML);
+
+    //   // const modalGallery = document.querySelector(".modal-gallery");
+    //   // modalGallery.insertAdjacentHTML("beforeend", figureForModalHTML);
+    // }
+
+    // if (response.status === 201) {
+    //   console.log("Données envoyées avec succès");
+    //   const data = await response.json();
+    //   console.log("Données retournées :", data);
+    //   console.log("Attribut 1 :", data.attribut1);
+    //   console.log("Attribut 2 :", data.attribut2);
+    //   return data;
+    // } else if (response.status === 400) {
+    //   console.log("Échec de l'envoi des données code 400 Bad Request");
+    // } else if (response.status === 401) {
+    //   console.log("Échec de l'envoi des données code 401 Unauthorized");
+    // } else if (response.status === 500) {
+    //   console.log("Échec de l'envoi des données code 500 Unexpected Error");
+    // } else {
+    //   console.log("nolosé");
+    // }
   }
 
   sendButton.classList.add("sendButton");
