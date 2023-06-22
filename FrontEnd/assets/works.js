@@ -1,10 +1,12 @@
-// // Extract datas from api and create elements on page // // //
+// Extractions des données de l'API, génération des élements sur la page principale
+// Et attribution dynamique d'id à chaque élement
+
 async function getWorksDatas() {
   await fetch("http://localhost:5678/api/works")
     .then((response) => response.json())
+
     .then((data) => {
       const gallery = document.querySelector(".gallery");
-
       data.forEach((item) => {
         const workElement = document.createElement("figure");
         workElement.classList.add("workElement");
@@ -27,26 +29,22 @@ async function getWorksDatas() {
 
 getWorksDatas();
 
-// // // Creating Filters // // //
+// // // Création des filtres par appel à l'API // // //
+
 const filtersArray = [];
 
 async function generateFilters() {
-  // Variables pour la fonction
   const filterSection = document.querySelector(".filters");
-
   const filterTous = document.createElement("div");
   filterTous.classList.add("filter");
   filterTous.setAttribute("id", "selected");
   filterTous.innerText = "Tous";
   filterSection.appendChild(filterTous);
   filtersArray.push(filterTous);
-
   const gallery = document.querySelector(".gallery");
 
   let currentIndex = 0;
-  let lastCategory = "";
-
-  //  Récupération des données
+  // let lastCategory = "";
   await fetch("http://localhost:5678/api/works")
     .then((response) => response.json())
     .then((data) => {
@@ -57,7 +55,7 @@ async function generateFilters() {
         categoriesSet.add(name);
       });
 
-      // Fonction pour le click sur Tous
+      //Click sur Tous
       filterTous.addEventListener("click", function () {
         gallery.innerHTML = "";
         getWorksDatas();
@@ -76,11 +74,8 @@ async function generateFilters() {
         // Fonction de tri par filtres
         filter.addEventListener("click", function (event) {
           const selectedFilter = event.target;
-          console.log(selectedFilter);
           const selectedCategory = selectedFilter.innerText;
-
           gallery.innerHTML = "";
-
           let worksToDisplay = [];
 
           worksToDisplay = data.filter(
@@ -89,13 +84,10 @@ async function generateFilters() {
 
           worksToDisplay.forEach((item) => {
             const workElement = document.createElement("figure");
-
             const imgWorkElement = document.createElement("img");
             imgWorkElement.src = item.imageUrl;
-
             const captionWorkElement = document.createElement("figcaption");
             captionWorkElement.innerText = item.title;
-
             gallery.appendChild(workElement);
             workElement.appendChild(imgWorkElement);
             workElement.appendChild(captionWorkElement);
