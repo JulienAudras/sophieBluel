@@ -440,13 +440,15 @@ form  button:hover{
 }
 
 .modal-gallery{
-	width: 430px;
-	height: 100%;
+	width: 450px;
+	max-height: 53%;
+	height: 53%;
 	margin-top: 47px;
 	margin-bottom: 47px;
 	display: flex;
 	flex-wrap: wrap;
 	gap: 10px;
+	overflow: auto;
 }
 
 .modal-window hr{

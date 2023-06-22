@@ -584,8 +584,8 @@ function generateAddPhotoModal() {
 
   uploadPhotoButton.addEventListener("change", updateSendButtonId);
   nameInput.addEventListener("input", updateSendButtonId);
-  categorySelect.addEventListener("change", updateSendButtonId);
-
+  categorySelect.addEventListener("click", updateSendButtonId);
+  // WAAAAAAAAAAAAAAAAAAAA
   const sendButton = document.createElement("button");
   const gallery = document.querySelector(".gallery");
   sendButton.type = "submit";
@@ -601,6 +601,7 @@ function generateAddPhotoModal() {
         img.remove();
         nameInput.value = "";
         categorySelect.selectedIndex = 0;
+        sendButton.removeAttribute("id");
         gallery.innerHTML = "";
         await getWorksDatas();
       } catch (error) {
