@@ -355,7 +355,6 @@ async function deleteElementById(id) {
   });
   if (response.ok) {
     const elementToRemove = document.getElementById("figureForMainPage" + id);
-    console.log(elementToRemove);
     const elementToRemoveFromModal = document.getElementById(
       "figureForModal" + id
     );
@@ -567,7 +566,6 @@ function generateAddPhotoModal() {
   addPhotoForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (sendButton.id === "buttonReadyToWork") {
-      console.log(uploadPhotoButton.files, nameInput.value, categoryName);
       event.preventDefault();
       try {
         await postDatas();
