@@ -149,6 +149,11 @@ function editorMode() {
   publishText.classList.add("publishText");
   publishButton.appendChild(publishText);
 
+  // Logout
+  const loginButton = document.querySelector(".loginOnHeader");
+  loginButton.textContent = "logout";
+  loginButton.addEventListener("click", logout);
+
   // Création des bouttons modifier aet attribution dynamique d'id à chaque élement
   const introSection = document.querySelector(".sectionPhotoIntro");
   insertButtonModifier(introSection);
@@ -161,6 +166,7 @@ function editorMode() {
   buttonModifierGalerie.addEventListener("click", generateAndOpenModal);
 }
 
+// Bouttons modifier
 let buttonModifierCounter = 0;
 
 function insertButtonModifier(targetSection) {
@@ -180,6 +186,13 @@ function insertButtonModifier(targetSection) {
   buttonModifierCounter++;
 
   targetSection.appendChild(buttonModifier);
+}
+
+// Fonction de logout
+
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "login.html";
 }
 
 // // // Fonctions d'ouverture et fermeture de modale // // //
